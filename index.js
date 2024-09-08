@@ -7,6 +7,11 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
     let sortSymbols = 'asc';
     let positionpagination = 0;
     const gap = 2;
+    let tableWidth = 0;
+
+        for (let i = 0; i < columns.length; i++) {
+            tableWidth += columns[i].width + gap;
+        }
 
     for (let j = 0; j < columns.length - 1; j++) {
         positionpagination += columns[j].width + gap * columns.length - 4;
@@ -20,7 +25,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
     }
                              
                    
-                            
+                             
                            
 
     const rowsPerPage_pagination_container = d3.select(".container")
@@ -34,17 +39,18 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
             const searchBarContainer = d3.select("body")
             .insert("div", ":first-child") 
             .attr("class", "searchBarContainer")
-            .style("left",`${positionpagination+50}px`)
+            .style("left",`${tableWidth-135}px`)
             .style("position", "absolute")
             .style("display", "flex")
             .style("align-items", "center");
 
             const searchDiv = searchBarContainer.append("div")
             .attr("class", "search-bar")
+            
             .style("display", "flex")
             .style("align-items", "center");
+           
 
-          
 
             const searchInput = searchDiv.append("input")
             .attr("type", "text")
@@ -86,6 +92,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
         .attr("for", "rows_Per_Page")
         .style("margin-left", "20px")
         .text("RowPerPage: ")
+        .style("color","#444")
         .style("font-family", "sans-serif");
 
     const select = rowPerPageDiv.append("div")
@@ -118,11 +125,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
         const start = (currentPage - 1) * rowsPerPage;
         const end = currentPage * rowsPerPage;
         const alterData = filteredData.slice(start, end);
-        let tableWidth = 0;
-
-        for (let i = 0; i < columns.length; i++) {
-            tableWidth += columns[i].width + gap;
-        }
+        
 
         const headerHeight = 45;
         const rowsHeight = 40;
@@ -221,6 +224,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
                     .attr("text-anchor", typeof row[column.name] === 'number' ? "middle" : "")
                     .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap) + 24))
                     .text(row[column.name])
+                    .attr("fill","#444")
                     .style("font-family", "Arial, sans-serif")
                     .attr("font-size", 14);
 
@@ -254,125 +258,147 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
         pagination.style("position", "absolute")
             .style("left", `${positionpagination}px`);
     
-        function createPageButton(pageNumber) {
+            function createPageButton(pageNumber) {
+                pagination.append("span")
+                    .attr("class", "Pagination")
+                    .style("cursor", "pointer")
+                    .style("background-color", pageNumber === currentPage ? "#e0e0e0" : "#f9f9f9")
+                    .style("border", pageNumber === currentPage ? "1px solid #333" : "1px solid #ddd")
+                    .style("padding", "8px 12px")
+                    .style("margin", "2px")
+                    .style("border-radius", "5px")
+                    .style("font-size", "14px")
+                    .style("font-weight", pageNumber === currentPage ? "bold" : "normal")
+                    .style("font-family", "Arial, sans-serif")
+                    .style("text-align", "center")
+                    .on("mouseover", function () {
+                        d3.select(this).style("background-color", "#d0d0d0");
+                    })
+                    .on("mouseout", function () {
+                        d3.select(this).style("background-color", pageNumber === currentPage ? "#e0e0e0" : "#f9f9f9");
+                    })
+                    .on("click", () => {
+                        currentPage = pageNumber;
+                        createTable();
+                        CreatePagination();
+                    })
+                    .append("tspan")
+                    .text(pageNumber);
+            }
+            
+            // Clear previous pagination
+            pagination.selectAll("*").remove();
+            
+            // Previous button
             pagination.append("span")
                 .attr("class", "Pagination")
-                .style("cursor", "pointer")
-                .style("background-color", pageNumber === currentPage ? "lightgray" : "white")
-                .style("border", pageNumber === currentPage ? "1px solid black" : "1px solid white")
-                .style("padding", "6px")
+                .style("cursor", currentPage === 1 ? "default" : "pointer")
+                .style("border", currentPage === 1 ? "1px solid #ddd" : "1px solid #333")
+                .style("padding", "8px 12px")
+                .style("background-color", "#f9f9f9")
                 .style("margin", "2px")
                 .style("border-radius", "5px")
+                .style("font-size", "14px")
+                .style("font-weight", "normal")
+                .style("font-family", "Arial, sans-serif")
+                .style("text-align", "center")
                 .on("mouseover", function () {
-                    d3.select(this).style("border", "1px solid black");
+                    if (currentPage > 1) {
+                        d3.select(this).style("background-color", "#d0d0d0");
+                    }
                 })
                 .on("mouseout", function () {
-                    d3.select(this).style("border", pageNumber === currentPage ? "1px solid black" : "1px solid white");
+                    d3.select(this).style("background-color", "#f9f9f9");
                 })
                 .on("click", () => {
-                    currentPage = pageNumber;
-                    createTable();
-                    CreatePagination();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        createTable();
+                        CreatePagination();
+                    }
                 })
-                .append("text")
-                .text(pageNumber)
-                .style("font-weight",pageNumber === currentPage ? 550 : 300)
-                .style("font-family", "sans-serif");
-        }
-    
-        pagination.append("span")
-            .attr("class", "Pagination")
-            .style("cursor", currentPage === 1 ? "default" : "pointer")
-            .style("border", currentPage === 1 ? "1px solid white" : "1px solid black")
-            .style("padding", "6px")
-            .style("background-color", "white")
-            .style("margin", "2px")
-            .style("border-radius", "5px")
-            .on("mouseover", function () {
-                if (currentPage > 1) {
-                    d3.select(this).style("background-color", "lightgray");
+                .append("tspan")
+                .text("Previous")
+                .style("color", currentPage === 1 ? "rgba(0, 0, 0, 0.375)" : "#333");
+            
+            // Pagination buttons
+            if (totalPage <= 5) {
+                for (let i = 1; i <= totalPage; i++) {
+                    createPageButton(i);
                 }
-            })
-            .on("mouseout", function () {
-                d3.select(this).style("background-color", "white");
-            })
-            .on("click", () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    createTable();
-                    CreatePagination();
-                }
-            })
-            .append("text")
-            .text("Previous")
-            .style("font-family", "sans-serif")
-            .style("color", currentPage === 1 ? "rgba(0, 0, 0, 0.375)" : "black");
-    
-        if (totalPage <= 5) {
-            for (let i = 1; i <= totalPage; i++) {
-                createPageButton(i);
-            }
-        } else {
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = Math.min(totalPage, currentPage + 2);
-    
-            if (startPage > 1) {
+            } else {
+                // Show the first page
                 createPageButton(1);
-                if (startPage > 2) {
-                    pagination.append("span")
-                        .attr("class", "Pagination")
-                        .style("background-color", "white")
-                        .style("padding", "8px")
-                        .style("margin", "2px")
-                        .text("...");
+            
+                const startPage = Math.max(2, currentPage - 1);
+                const endPage = Math.min(totalPage - 1, currentPage + 1);
+            
+                if (currentPage > 3) {
+                    if (startPage > 2) {
+                        pagination.append("span")
+                            .attr("class", "Pagination")
+                            .style("background-color", "#f9f9f9")
+                            .style("padding", "8px 12px")
+                            .style("margin", "2px")
+                            .style("border", "1px solid #ddd")
+                            .style("text-align", "center")
+                            .text("...");
+                    }
                 }
-            }
-    
-            for (let i = startPage; i <= endPage; i++) {
-                createPageButton(i);
-            }
-    
-            if (endPage < totalPage) {
-                if (endPage < totalPage - 1) {
-                    pagination.append("span")
-                        .attr("class", "Pagination")
-                        .style("background-color", "white")
-                        .style("padding", "8px")
-                        .style("margin", "2px")
-                        .text("...");
+            
+                for (let i = startPage; i <= endPage; i++) {
+                    createPageButton(i);
                 }
+            
+                if (currentPage < totalPage - 2) {
+                    if (endPage < totalPage - 1) {
+                        pagination.append("span")
+                            .attr("class", "Pagination")
+                            .style("background-color", "#f9f9f9")
+                            .style("padding", "8px 12px")
+                            .style("margin", "2px")
+                            .style("border", "1px solid #ddd")
+                            .style("text-align", "center")
+                            .text("...");
+                    }
+                }
+            
+                // Show the last page
                 createPageButton(totalPage);
             }
-        }
-    
-        pagination.append("span")
-            .attr("class", "Pagination")
-            .style("cursor", currentPage < totalPage ? "pointer" : "default")
-            .style("background-color", "white")
-            .style("border", currentPage < totalPage ? "1px solid black" : "1px solid white")
-            .style("padding", "6px")
-            .style("margin", "2px")
-            .style("border-radius", "5px")
-            .on("mouseover", function () {
-                if (currentPage < totalPage) {
-                    d3.select(this).style("background-color", "lightgray");
-                }
-            })
-            .on("mouseout", function () {
-                d3.select(this).style("background-color", "white");
-            })
-            .on("click", () => {
-                if (currentPage < totalPage) {
-                    currentPage++;
-                    createTable();
-                    CreatePagination();
-                }
-            })
-            .append("text")
-            .text("Next")
-            .style("font-family", "Arial, sans-serif")
-            .style("color", currentPage < totalPage ? "black" : "rgba(0, 0, 0, 0.375)");
-    }
+            
+            // Next button
+            pagination.append("span")
+                .attr("class", "Pagination")
+                .style("cursor", currentPage < totalPage ? "pointer" : "default")
+                .style("background-color", "#f9f9f9")
+                .style("border", currentPage < totalPage ? "1px solid #333" : "1px solid #ddd")
+                .style("padding", "8px 12px")
+                .style("margin", "2px")
+                .style("border-radius", "5px")
+                .style("font-size", "14px")
+                .style("font-weight", "normal")
+                .style("font-family", "Arial, sans-serif")
+                .style("text-align", "center")
+                .on("mouseover", function () {
+                    if (currentPage < totalPage) {
+                        d3.select(this).style("background-color", "#d0d0d0");
+                    }
+                })
+                .on("mouseout", function () {
+                    d3.select(this).style("background-color", "#f9f9f9");
+                })
+                .on("click", () => {
+                    if (currentPage < totalPage) {
+                        currentPage++;
+                        createTable();
+                        CreatePagination();
+                    }
+                })
+                .append("tspan")
+                .text("Next")
+                .style("color", currentPage < totalPage ? "#333" : "rgba(0, 0, 0, 0.375)");
+            }                        
     
 
     d3.select("#rows_Per_Page").on("change", function () {
@@ -398,23 +424,16 @@ const inputs = {
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
+        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
+        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
+           
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-       
         { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
         { "Name": "Kalyan", "Age": 55, "Place": "Karnataka", "PhoneNumber": 7725896001, "Email-id": "harishkalyan@gmail.com" }
     ],
