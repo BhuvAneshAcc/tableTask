@@ -25,7 +25,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
     }
                              
                    
-                             
+                            
                            
 
     const rowsPerPage_pagination_container = d3.select(".container")
@@ -35,11 +35,10 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
         .style("display", "flex")
         .style("margin-top", "20px")
         .style("align-items", "center");
-
             const searchBarContainer = d3.select("body")
             .insert("div", ":first-child") 
             .attr("class", "searchBarContainer")
-            .style("left",`${tableWidth-135}px`)
+            .style("left",`${tableWidth-136}px`)
             .style("position", "absolute")
             .style("display", "flex")
             .style("align-items", "center");
@@ -49,8 +48,8 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
             
             .style("display", "flex")
             .style("align-items", "center");
-           
 
+          
 
             const searchInput = searchDiv.append("input")
             .attr("type", "text")
@@ -424,16 +423,8 @@ const inputs = {
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-           
-        { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
+        
         { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
         { "Name": "Kalyan", "Age": 55, "Place": "Karnataka", "PhoneNumber": 7725896001, "Email-id": "harishkalyan@gmail.com" }
     ],
