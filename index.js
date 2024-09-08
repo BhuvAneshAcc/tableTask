@@ -38,7 +38,7 @@ function table({selects, data, header, allowPagination, rowsPerPage}) {
             const searchBarContainer = d3.select("body")
             .insert("div", ":first-child") 
             .attr("class", "searchBarContainer")
-            .style("left",`${tableWidth-136}px`)
+            .style("left",`${tableWidth-155}px`)
             .style("position", "absolute")
             .style("display", "flex")
             .style("align-items", "center");
