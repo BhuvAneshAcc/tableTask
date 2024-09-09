@@ -23,7 +23,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
     containerHead.append("h2")
     .attr("class", "title_table")
     .style("width","100%")
-    .style("font-size", "3vw")
+    .style("font-size", "2.4vmax")
     .style("color","#444")
     .style("font-family", "sans-serif")
     .text(title);
@@ -37,12 +37,12 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         .attr("type", "text")
         
         .attr("placeholder", "Search")
-        .style("font-size","2vw")
-        .style("font-size","2vh")
+        .style("font-size","2vmin")
 
-        .style("padding", "15px")
-        .style("padding-left","30px")
-        .style("width","20vw")
+        .style("padding", "1vw")
+        .style("padding-left","2vw")
+        .style("width","20vmax")
+        .style("margin-top","18px")
         .style("height","2vh")
         .on("mouseover", function(){
             d3.select(this)
@@ -81,17 +81,17 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
     .style("display", "flex")
     .style("justify-content", "space-between")
     .style("align-items", "center")
-    .style("margin-top", "20px");
+    .style("margin-top", "1.5vw");
     const rowsPerPage_pagination_container =bottomTableContainer.append("div")
         .attr("class", "rows_Per_Page_pagination")
         .style("display", "flex")
-        .style("margin-top","20px")
+        .style("margin-top","5px")
         .style("align-items", "center");
 
     const rowPerPageDiv = rowsPerPage_pagination_container.append("div")
         .attr("class", "rows_Per_Page")
         .style("display", "flex")
-        .style("font-size","1.5vw")
+        .style("font-size","1.4vmax")
         .style("align-items", "center");
 
     rowPerPageDiv.append("label")
@@ -103,11 +103,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
 
     const select = rowPerPageDiv.append("div")
         .attr("id", "rows_Per_Page_div")
-        .style("margin-left", "3px")
         .append("select")
         .attr("id", "rows_Per_Page")
-        .style("padding", "12px")
-        .style("font-size","1.3vw")
+        .style("padding", "0.5vmin")
+        .style("font-size","1.35vmax")
     
 
         .style("cursor", "pointer")
@@ -166,7 +165,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     .attr("fill","#444")
                     .style("font-family", "Arial, sans-serif")
                     .attr("font-weight", "500")
-                    .attr("font-size", 16)
+                    .attr("font-size", "2vmin")
                     
     
                 if (column.sortable && sortColumn === column.name) {
@@ -235,11 +234,11 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     const rowData = svg.append("text")
                         .attr("x", typeof row[column.name] === 'number' ? x + column.width / 2 : x + 15)
                         .attr("text-anchor", typeof row[column.name] === 'number' ? "middle" : "")
-                        .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap) + 25))
+                        .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap) + 24))
                         .text(row[column.name])
                         .attr("fill","#444")
                         .style("font-family", "Arial, sans-serif")
-                        .attr("font-size", 14);
+                        .attr("font-size", "1.5vmin");
     
                     x += column.width + gap;
                 });
@@ -275,10 +274,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .style("cursor", "pointer")
                         .style("background-color", pageNumber === currentPage ? "#e0e0e0" : "#f9f9f9")
                         .style("border", pageNumber === currentPage ? "1px solid #333" : "1px solid #ddd")
-                        .style("padding", "0.5vw 0.7vw")
-                        .style("margin", "4px")
+                        .style("padding", "0.8vw")
+                        .style("margin", "3px")
                         .style("border-radius", "5px")
-                        .style("font-size", "2vw")
+                        .style("font-size", "2vmin")
                         .style("font-weight", pageNumber === currentPage ? "bold" : "normal")
                         .style("font-family", "Arial, sans-serif")
                         .style("text-align", "center")
@@ -305,11 +304,11 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     .attr("class", "Pagination")
                     .style("cursor", currentPage === 1 ? "default" : "pointer")
                     .style("border", currentPage === 1 ? "1px solid #ddd" : "1px solid #333")
-                    .style("padding", "0.5vw 0.7vw")
+                    .style("padding", "0.8vw")
                     .style("background-color", "#f9f9f9")
                     .style("margin", "4px")
                     .style("border-radius", "5px")
-                    .style("font-size", "2vw")
+                    .style("font-size", "2vmin")
                     .style("font-weight", "normal")
                     .style("font-family", "Arial, sans-serif")
                     .style("text-align", "center")
@@ -347,7 +346,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                             pagination.append("span")
                                 .attr("class", "Pagination")
                                 .style("background-color", "#f9f9f9")
-                                .style("padding", "8px 12px")
+                                .style("padding", "0.8vw")
                                 .style("margin", "4px")
                                 .style("border", "1px solid #ddd")
                                 .style("text-align", "center")
@@ -364,8 +363,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                             pagination.append("span")
                                 .attr("class", "Pagination")
                                 .style("background-color", "#f9f9f9")
-                                .style("padding", "8px 12px")
-                                .style("margin", "2px")
+                                .style("padding", "0.8vw")
+                                .style("margin", "4px")
                                 .style("border", "1px solid #ddd")
                                 .style("text-align", "center")
                                 .text("...");
@@ -380,10 +379,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     .style("cursor", currentPage < totalPage ? "pointer" : "default")
                     .style("background-color", "#f9f9f9")
                     .style("border", currentPage < totalPage ? "1px solid #333" : "1px solid #ddd")
-                    .style("padding", "0.5vw 0.7vw")
+                    .style("padding", "0.8vw")
                     .style("margin", "2px")
                     .style("border-radius", "5px")
-                    .style("font-size", "2vw")
+                    .style("font-size", "2vmin")
                     .style("font-weight", "normal")
                     .style("font-family", "Arial, sans-serif")
                     .style("text-align", "center")
