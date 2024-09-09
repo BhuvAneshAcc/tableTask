@@ -23,7 +23,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
     containerHead.append("h2")
     .attr("class", "title_table")
     .style("width","100%")
-    .style("font-size", "2.4vmax")
+    .style("font-size", "2.4vw")
     .style("color","#444")
     .style("font-family", "sans-serif")
     .text(title);
@@ -39,11 +39,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         .attr("placeholder", "Search")
         .style("font-size","2vmin")
 
-        .style("padding", "1vw")
+        .style("padding", "0.8vmax")
         .style("padding-left","2vw")
-        .style("width","20vmax")
+        .style("width","25vmin")
         .style("margin-top","18px")
-        .style("height","2vh")
         .on("mouseover", function(){
             d3.select(this)
                 .style("border","1px solid black")
@@ -106,7 +105,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         .append("select")
         .attr("id", "rows_Per_Page")
         .style("padding", "0.5vmin")
-        .style("font-size","1.35vmax")
+        .style("font-size","1.3vmax")
     
 
         .style("cursor", "pointer")
