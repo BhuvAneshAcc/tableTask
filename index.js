@@ -11,7 +11,6 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
     for (let i = 0; i < columns.length; i++) {
         tableWidth += columns[i].width + gap;
     }
-    
 
     const containerHead = d3.select(".container")
     .insert("div", ":first-child")  
@@ -19,7 +18,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
     .style("display", "flex")
     .style("align-items", "center")
     .style("justify-content", "space-between")
-    .style("margin-bottom", "10px");
+    .style("margin-bottom", "5px");
 
     containerHead.append("h2")
     .attr("class", "title_table")
@@ -38,12 +37,11 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         .attr("type", "text")
         
         .attr("placeholder", "Search")
-        .style("font-size","clamp(12px, 1.6vw, 15px)")
+        .style("font-size","clamp(6px, 1.6vw, 12px)")
 
         .style("padding", "0.8vmax")
         .style("padding-left","2vw")
         .style("width","20vmax")
-        .style("margin-top","18px")
         .on("mouseover", function(){
             d3.select(this)
                 .style("border","1px solid black")
@@ -173,12 +171,13 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .attr("x", x + column.width - 28)
                         .attr("y", 28)
                         .text(sortSymbols === 'asc' ? '▲' : '▼')
-                        .style("fill","rgb(32, 31, 31)")
+                        .style("fill","rgb(64, 65, 65)")
+                    
                         .style("cursor", column.sortable ? 'pointer' : 'default')
                         .on("mouseover", function () {
                             if (column.sortable) {
                                 d3.select(this)
-                                  .attr("stroke", "rgb(32, 31, 31)")
+                                  .attr("stroke", "rgb(64, 65, 65)")
                                   .attr("stroke-width",1)
                             }
                         })
@@ -197,7 +196,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .on("mouseover", function () {
                             if (column.sortable) {
                                 d3.select(this)
-                                  .attr("stroke", "rgb(32, 31, 31)")
+                                  .attr("stroke", "rgb(64, 65, 65)")
                                   .attr("stroke-width",0.5)
                             }
                         })
@@ -237,6 +236,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap) + 24))
                         .text(row[column.name])
                         .attr("fill","#444")
+                        .style("overflow-x", "scroll")
+
                         .style("font-family", "Arial, sans-serif")
                         .attr("font-size", "clamp(12px, 1.5vw, 12px)");
     
@@ -272,8 +273,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     pagination.append("span")
                         .attr("class", "Pagination")
                         .style("cursor", "pointer")
-                        .style("background-color", pageNumber === currentPage ? "#e0e0e0" : "#f9f9f9")
-                        .style("border", pageNumber === currentPage ? "1px solid #333" : "1px solid #ddd")
+                        .style("background-color", pageNumber === currentPage ? "#e0e0e0" : "#ffffff")
+                        .style("border", pageNumber === currentPage ? "1px solid #444" : "1px solid #ddd")
                         .style("padding", "0.8vw")
                         .style("margin", "2.4px")
                         .style("color","#444")
@@ -297,10 +298,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .text(pageNumber);
                 }
                 
-                // Clear previous pagination
                 pagination.selectAll("*").remove();
                 
-                // Previous button
                 pagination.append("span")
                     .attr("class", "Pagination")
                     .style("cursor", currentPage === 1 ? "default" : "pointer")
@@ -437,16 +436,7 @@ const inputs = {
          { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
          { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
          { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-         { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-          { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-          { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-          { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-          { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
            { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-           { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-           { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-           { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-            { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
            
         { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
         { "Name": "Kalyan", "Age": 55, "Place": "Karnataka", "PhoneNumber": 7725896001, "Email-id": "harishkalyan@gmail.com" }
