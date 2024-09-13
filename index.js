@@ -1,17 +1,15 @@
-
-function table({selects, data, header, title, allowPagination, rowsPerPage}) {
+function table({selects, data,columnWidths, columns, title, allowPagination, rowsPerPage}) {
     let filteredData = [...data]; 
-    const columns = header.columns;
     const svg = d3.select(selects);
+    const container = d3.select(".container");
+    const rowsHeight = 50;
+            const widths="100%";
+    const svgWidth = container.node().clientWidth;
+    const calculatedWidths = columnWidths.map(d => (d / 100) * svgWidth);
     let currentPage = 1;
     let sortColumn = null;
     let sortSymbols = 'asc';
-    const gap = 2;
-    let tableWidth = 0;
-    for (let i = 0; i < columns.length; i++) {
-        tableWidth += columns[i].width + gap;
-    }
-
+        const gap = 2;
     const containerHead = d3.select(".container")
     .insert("div", ":first-child")  
     .attr("class", "container_head")
@@ -35,10 +33,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
 
     const searchInput = searchDiv.append("input")
         .attr("type", "text")
-        
         .attr("placeholder", "Search")
         .style("font-size","clamp(6px, 1.6vw, 12px)")
-
         .style("padding", "0.8vmax")
         .style("padding-left","2vw")
         .style("width","20vmax")
@@ -61,7 +57,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         currentPage = 1; 
 
         createTable(); 
-        if (allowPagination) {
+            if (allowPagination) {
             CreatePagination(); 
         }
     });
@@ -104,9 +100,6 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         .append("select")
         .attr("id", "rows_Per_Page")
         .style("padding", "0.5vmin")
-        .style("font-size","1.3vmax")
-    
-
         .style("cursor", "pointer")
         .on("mouseover", function () {
             d3.select(this).style("background-color", "lightgray");
@@ -127,49 +120,56 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
         d3.select(".bottom_table_container")
         .append("div")
         .attr("class", "pagination_container")
+        function updateSVGDimensions() {
+            const svgWidth = container.node().clientWidth;
+            const calculatedWidths = columnWidths.map(d => (d / 100) * svgWidth);
+            const totalHeight = filteredData.length * (rowsHeight + gap);
+            const calculatedHeight = rowsPerPage * (rowsHeight + gap) + rowsHeight;
+            
+            svg.attr("width", svgWidth); // Update width dynamically
+            svg.attr("height", calculatedHeight); // Update height dynamically
+            svg.attr("viewBox", `0 0 ${svgWidth} ${calculatedHeight}`);
+            
+            return { svgWidth, calculatedWidths, calculatedHeight };
+        }
 
     
         function createTable() {
+            const { svgWidth, calculatedWidths, calculatedHeight } = updateSVGDimensions();
+
             const start = (currentPage - 1) * rowsPerPage;
             const end = currentPage * rowsPerPage;
             const alterData = filteredData.slice(start, end);
             
-    
-            const headerHeight = 45;
-            const rowsHeight = 40;
-            const tableHeight = headerHeight + rowsPerPage * rowsHeight + gap * rowsPerPage;
-
-    
-            svg.attr("width", tableWidth).attr("height", tableHeight)
-            .attr("viewBox",'0 0 ' + tableWidth + ' ' + tableHeight)
-
+            let height=rowsPerPage * rowsHeight+ rowsPerPage*gap +rowsHeight 
+          
+          
             svg.selectAll("*").remove();
-    
+            
             let x = 0;
-            columns.forEach((column) => {
+            columns.forEach((column,i) => {
                 const head = svg.append("rect")
                     .attr("x", x)
                     .attr("y", 0)
-                    .attr("width", column.width)
-                    .attr("height", headerHeight)
+                    .attr("width", calculatedWidths[i] )
+                    .attr("height", rowsHeight)
                     .attr("fill", "lightgray")
                     .attr("rx", 5)
                     .attr("ry", 5);
-          
+
                 const headerName = svg.append("text")
-                    .attr("x", x + 15)
-                    .attr("y", 28)
+                    .attr("x", x + 20)
+                    .attr("y", 30)
                     .text(column.name)
                     .attr("fill","#444")
                     .style("font-family", "Arial, sans-serif")
                     .attr("font-weight", "500")
-                    .attr("font-size", "clamp(14px, 2vw, 14px)")
+                    .attr("font-size", "clamp(12px,1vw,16px)")
                     
-    
-                if (column.sortable && sortColumn === column.name) {
+                    if (column.sortable && sortColumn === column.name) {
                     svg.append("text")
-                        .attr("x", x + column.width - 28)
-                        .attr("y", 28)
+                        .attr("x", x + calculatedWidths[i] - 28)
+                        .attr("y", 30)
                         .text(sortSymbols === 'asc' ? '▲' : '▼')
                         .style("fill","rgb(64, 65, 65)")
                     
@@ -190,8 +190,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                 } else if (column.sortable) {
                     svg.append("text")
                         .attr("class", "headSymbols")
-                        .attr("x", x + column.width - 28)
-                        .attr("y", 28)
+                        .attr("x", x + calculatedWidths[i] - 28)
+                        .attr("y", 30)
                         .text("⇅")
                         .on("mouseover", function () {
                             if (column.sortable) {
@@ -210,41 +210,38 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         });
                 }
     
-                x += column.width + gap;
+                x += calculatedWidths[i] + gap;
             });
-    
             alterData.forEach((row, rowIndex) => {
                 let x = 0;
-                columns.forEach((column) => {
+                columns.forEach((column,index) => {
                     const rowrect = svg.append("rect")
                         .attr("class", "sortedDesign")
                         .attr("x", x)
-                        .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap)))
-                        .attr("width", column.width)
+                        .attr("y",(rowsHeight+gap+ (rowIndex * (rowsHeight + gap))))
+                        .attr("width", calculatedWidths[index])
                         .attr("height", rowsHeight)
                         .attr("fill", "white")
                         .attr("rx", 5)
                         .attr("ry", 5);
-    
                     if (column.sortable && sortColumn === column.name) {
                         rowrect.style("filter", "drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.3))");
                     }
     
                     const rowData = svg.append("text")
-                        .attr("x", typeof row[column.name] === 'number' ? x + column.width / 2 : x + 15)
+                        .attr("x", typeof row[column.name] === 'number' ? x + calculatedWidths[index]/ 2 : x + 20)
                         .attr("text-anchor", typeof row[column.name] === 'number' ? "middle" : "")
-                        .attr("y", headerHeight + gap + (rowIndex * (rowsHeight + gap) + 24))
+                        .attr("y",(rowsHeight + gap + (rowIndex * (rowsHeight + gap)) + 30))
                         .text(row[column.name])
                         .attr("fill","#444")
                         .style("overflow-x", "scroll")
-
                         .style("font-family", "Arial, sans-serif")
-                        .attr("font-size", "clamp(12px, 1.5vw, 12px)");
+                        .attr("font-size", "clamp(10px,1vw,14px)");
     
-                    x += column.width + gap;
+                    x += calculatedWidths[index] + gap;
                 });
             });
-        }
+         }
 
         function sortTable(columnName) {
             if (sortColumn === columnName) {
@@ -261,9 +258,7 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                 }
             });
             createTable();
-        }
-    
-
+                 }
         function CreatePagination() {
             const totalPage = Math.ceil(filteredData.length / rowsPerPage);
             const pagination = d3.select(".pagination_container");
@@ -292,15 +287,13 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         .on("click", () => {
                             currentPage = pageNumber;
                             createTable();
-                            CreatePagination();
+                                                     CreatePagination();
                         })
                         .append("tspan")
                         .text(pageNumber);
                 }
-                
-                pagination.selectAll("*").remove();
-                
-                pagination.append("span")
+                                 pagination.selectAll("*").remove();
+                            pagination.append("span")
                     .attr("class", "Pagination")
                     .style("cursor", currentPage === 1 ? "default" : "pointer")
                     .style("border", currentPage === 1 ? "1px solid #ddd" : "1px solid #333")
@@ -324,6 +317,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         if (currentPage > 1) {
                             currentPage--;
                             createTable();
+                            
+
                             CreatePagination();
                         }
                     })
@@ -336,12 +331,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         createPageButton(i);
                     }
                 } else {
-                    createPageButton(1);
-                
+                    createPageButton(1);               
                     const startPage = Math.max(2, currentPage - 1);
                     const endPage = Math.min(totalPage - 1, currentPage + 1);
-                
-                    if (currentPage > 3) {
+                       if (currentPage > 3) {
                         if (startPage > 2) {
                             pagination.append("span")
                                 .attr("class", "Pagination")
@@ -353,12 +346,10 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                                 .text("...");
                         }
                     }
-                
                     for (let i = startPage; i <= endPage; i++) {
                         createPageButton(i);
                     }
-                
-                    if (currentPage < totalPage - 2) {
+                      if (currentPage < totalPage - 2) {
                         if (endPage < totalPage - 1) {
                             pagination.append("span")
                                 .attr("class", "Pagination")
@@ -369,11 +360,9 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                                 .style("text-align", "center")
                                 .text("...");
                         }
-                    }
-                
+                    }              
                     createPageButton(totalPage);
                 }
-                
                     pagination.append("span")
                     .attr("class", "Pagination")
                     .style("cursor", currentPage < totalPage ? "pointer" : "default")
@@ -398,6 +387,8 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                         if (currentPage < totalPage) {
                             currentPage++;
                             createTable();
+                            
+
                             CreatePagination();
                         }
                     })
@@ -405,53 +396,68 @@ function table({selects, data, header, title, allowPagination, rowsPerPage}) {
                     .text("Next")
                     .style("color", currentPage < totalPage ? "#333" : "rgba(0, 0, 0, 0.375)");
                 }                        
-        
-
     d3.select("#rows_Per_Page").on("change", function () {
         rowsPerPage = +this.value; 
         if (allowPagination) {
             CreatePagination();
         }
         createTable();
-    });
-
+         });
     if (allowPagination) {
         CreatePagination();
     }
+    function handleResize() {
+        createTable(); // Re-render the table after resize
+    }
 
+    window.addEventListener("resize", handleResize);
     createTable();
 }
-
 const inputs = {
     selects: "#table",
     title: "Personal Information",  
     data: [
         { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-        { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-        { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-        { "Name": "Rajesh", "Age": 24, "Place": "Kerala", "PhoneNumber": 8579641357, "Email-id": "rajesh382@gmail.com" },
-         { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-         { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
-         { "Name": "Raj Kumar", "Age": 35, "Place": "Tenkasi", "PhoneNumber": 9003418837, "Email-id": "rajkumar1234@gmail.com" },
-           { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
-           
-        { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+       { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+       { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+       { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+      { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+      { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+      { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+     { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+     { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+     { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+    { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+    { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+    { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+   { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+   { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+   { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+  { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+  { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+  { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+ { "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+ { "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+ { "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+{ "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+{ "Name": "Bhuvnanesh", "Age": 21, "Place": "Chennai", "PhoneNumber": 8248995718, "Email-id": "bhuvanesh123@gmail.com" },
+{ "Name": "Joshwin", "Age": 25, "Place": "Odisha", "PhoneNumber": 9248414482, "Email-id": "joshwinraj@gmail.com" },
+{ "Name": "Lisa", "Age": 27, "Place": "Hyderabed", "PhoneNumber": 8824896571, "Email-id": "lalisa123@gmail.com" },
+
         { "Name": "Kalyan", "Age": 55, "Place": "Karnataka", "PhoneNumber": 7725896001, "Email-id": "harishkalyan@gmail.com" }
     ],
-    header: {
-        columns: [
-            { name: "Name", width: 150, sortable: true },
-            { name: "Age", width: 90, sortable: true },
-            { name: "Place", width: 120, sortable: true },
-            { name: "PhoneNumber", width: 160, sortable: false },
-            { name: "Email-id", width: 260, sortable: false }
-        ]
-    },
+     columnWidths : [20, 15, 20,20, 25],
+      columns: [
+            { name: "Name", sortable: true },
+            { name: "Age",sortable: true },
+
+            { name: "Place",sortable: true },
+            { name: "PhoneNumber",  sortable: false },
+           { name: "Email-id", sortable: false }
+        ],
+
     allowPagination: true,
     rowsPerPage: 10
 };
-
 table(inputs);
